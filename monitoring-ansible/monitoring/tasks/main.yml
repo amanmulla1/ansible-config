@@ -61,7 +61,7 @@
 
 - name: Install Grafana
   yum:
-    name: "{{ grafana_rpm_url }}"
+    name: https://rpm.grafana.com/grafana-11.1.0-1.x86_64.rpm
     state: present
 
 - name: Enable and start Grafana
