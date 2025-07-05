@@ -59,9 +59,18 @@
 
 # ---------------- Grafana ----------------
 
+- name: Add Grafana YUM repository
+  yum_repository:
+    name: grafana
+    description: Grafana YUM repo
+    baseurl: https://rpm.grafana.com
+    gpgcheck: yes
+    gpgkey: https://rpm.grafana.com/gpg.key
+    enabled: yes
+
 - name: Install Grafana
   yum:
-    name: https://rpm.grafana.com/grafana-11.1.0-1.x86_64.rpm
+    name: grafana
     state: present
 
 - name: Enable and start Grafana
