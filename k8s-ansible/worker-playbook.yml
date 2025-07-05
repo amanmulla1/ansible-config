@@ -1,0 +1,17 @@
+---
+- name: Kubernetes Worker Setup and Join
+  hosts: worker
+  become: true
+  vars:
+    join_command_path: /tmp/kubeadm_join_command.txt
+
+  pre_tasks:
+    - name: Fetch kubeadm join command from master
+      delegate_to: kmaster-node
+      fetch:
+        src: "{{ join_command_path }}"
+        dest: /tmp/kubeadm_join_command.txt
+        flat: yes
+
+  roles:
+    - worker

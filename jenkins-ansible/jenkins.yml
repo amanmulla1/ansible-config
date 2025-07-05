@@ -1,0 +1,9 @@
+# - hosts: jenkins_master
+#   become: true
+#   roles:
+#     - jenkins_master
+
+- hosts: jenkins_slave
+  become: true
+  roles:
+    - jenkins_slave

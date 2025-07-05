@@ -1,0 +1,7 @@
+---
+- name: Kubernetes Master Setup
+  hosts: master
+  become: true
+
+  roles:
+    - master

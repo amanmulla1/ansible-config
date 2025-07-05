@@ -1,0 +1,71 @@
+---
+- name: Update system
+  yum:
+    name: "*"
+    state: latest
+
+- name: Create directories
+  file:
+    path: "/opt/{{ item }}"
+    state: directory
+  loop:
+    - prometheus
+    - node_exporter
+
+# ---------------- Prometheus ----------------
+
+- name: Download Prometheus
+  get_url:
+    url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    dest: /tmp/prometheus.tar.gz
+
+- name: Extract Prometheus
+  unarchive:
+    src: /tmp/prometheus.tar.gz
+    dest: /opt/prometheus/
+    remote_src: yes
+    extra_opts: [--strip-components=1]
+
+- name: Copy Prometheus config
+  copy:
+    src: prometheus.yml
+    dest: /opt/prometheus/prometheus.yml
+
+- name: Deploy Prometheus service
+  template:
+    src: prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+  notify: Restart Prometheus
+
+# ---------------- Node Exporter ----------------
+
+- name: Download Node Exporter
+  get_url:
+    url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-amd64.tar.gz"
+    dest: /tmp/node_exporter.tar.gz
+
+- name: Extract Node Exporter
+  unarchive:
+    src: /tmp/node_exporter.tar.gz
+    dest: /opt/node_exporter/
+    remote_src: yes
+    extra_opts: [--strip-components=1]
+
+- name: Deploy Node Exporter service
+  template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+  notify: Restart Node Exporter
+
+# ---------------- Grafana ----------------
+
+- name: Install Grafana
+  yum:
+    name: "{{ grafana_rpm_url }}"
+    state: present
+
+- name: Enable and start Grafana
+  systemd:
+    name: grafana-server
+    enabled: yes
+    state: started
